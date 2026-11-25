@@ -242,7 +242,15 @@
     .share { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
     .share .btn { width: 100%; }
 
-    .tiny { font-size: 0.85rem; margin-top: 16px; }
+    .send-status {
+      margin-top: 18px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink-soft);
+    }
+    .send-status.ok { color: #2b8a3e; }
+    .send-status.fail { color: var(--rose-dark); }
+    [hidden] { display: none !important; }
 
     .signoff {
       font-family: 'Dancing Script', cursive;
@@ -329,12 +337,12 @@
 
       <div class="summary" id="summary"></div>
 
+      <p class="send-status" id="sendStatus" role="status">Sending it to me… 💌</p>
+
       <div class="share">
-        <a class="btn btn-primary" id="smsBtn" href="#">📱 Text me your answer</a>
-        <button class="btn-ghost" id="copyBtn" type="button">📋 Copy it</button>
+        <a class="btn btn-primary" id="smsBtn" href="#" hidden>📱 Text it to me instead</a>
         <button class="btn-ghost" id="editBtn" type="button">✏️ Change something</button>
       </div>
-      <p class="tiny">Tap “Text me your answer” so I get it — then it’s locked in 😊</p>
 
       <div class="signoff">See you soon, Teeya ❤️</div>
     </section>
@@ -342,6 +350,22 @@
   </main>
 
   <script>
+    // ---- Where her answer goes ----
+    // Her answers are sent as push notifications through ntfy.sh (free, no account).
+    // Install the "ntfy" app on your phone and subscribe to this exact topic name.
+    const NTFY_TOPIC = 'teeya-date-25307fccd6d4';
+    // Only used as a backup if sending fails: your phone number, e.g. '+15551234567'
+    const PHONE = '';
+
+    async function notifyMe(title, message, tags) {
+      // Posting JSON to the root URL as plain text avoids a CORS preflight.
+      const res = await fetch('https://ntfy.sh/', {
+        method: 'POST',
+        body: JSON.stringify({ topic: NTFY_TOPIC, title, message, tags, priority: 5 })
+      });
+      if (!res.ok) throw new Error('ntfy ' + res.status);
+    }
+
     // ---- Floating hearts ----
     const heartsEl = document.getElementById('hearts');
     const heartChars = ['💗', '💕', '💖', '❤️', '🌸', '💞'];
@@ -419,6 +443,9 @@
       noBtn.style.display = 'none';
       heartBurst();
       show('step-plan');
+      const tries = noCount ? ` (after trying to press No ${noCount} time${noCount > 1 ? 's' : ''} 😂)` : '';
+      notifyMe('Teeya said YES! 💕', `She's picking a date and time right now${tries}`, ['heart'])
+        .catch(() => {});
     });
 
     // ---- Form ----
@@ -475,33 +502,35 @@
         .join('');
 
       const message =
-        `Yes! 💕 Let's go on a date!\n` +
         `📅 ${answer.date}\n` +
         `⏰ ${answer.time}\n` +
         `✨ ${answer.activity}` +
-        (answer.note ? `\n💬 ${answer.note}` : '') +
-        `\n— Teeya`;
-      answer.message = message;
+        (answer.note ? `\n💬 ${answer.note}` : '');
 
-      // To have the text go straight to you, put your phone number here, e.g. 'sms:+15551234567'
-      const PHONE = '';
+      const smsBtn = document.getElementById('smsBtn');
+      const status = document.getElementById('sendStatus');
       const sep = /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent) ? '&' : '?';
-      document.getElementById('smsBtn').href = `sms:${PHONE}${sep}body=${encodeURIComponent(message)}`;
+      smsBtn.href = `sms:${PHONE}${sep}body=${encodeURIComponent("Yes! Let's go on a date 💕\n" + message)}`;
+      smsBtn.hidden = true;
+      status.className = 'send-status';
+      status.textContent = 'Sending it to me… 💌';
 
       heartBurst();
       show('step-done');
-    });
 
-    document.getElementById('copyBtn').addEventListener('click', async (e) => {
-      const btn = e.currentTarget;
-      try {
-        await navigator.clipboard.writeText(answer.message);
-        btn.textContent = '✅ Copied!';
-      } catch {
-        btn.textContent = '😅 Couldn’t copy — screenshot it instead';
-      }
-      setTimeout(() => { btn.textContent = '📋 Copy it'; }, 2200);
+      notifyMe(submittedOnce ? 'Teeya updated the plan ✏️' : "Teeya picked our date! 💖", message, ['calendar', 'heart'])
+        .then(() => {
+          submittedOnce = true;
+          status.className = 'send-status ok';
+          status.textContent = '✅ Sent! I’ve got it — it’s a date.';
+        })
+        .catch(() => {
+          status.className = 'send-status fail';
+          status.textContent = 'Hmm, that didn’t go through 😅 Text it to me instead?';
+          smsBtn.hidden = false;
+        });
     });
+    let submittedOnce = false;
 
     document.getElementById('editBtn').addEventListener('click', () => show('step-plan'));
   </script>
