@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Teeya 💌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #ffe3ec;
+      --bg-2: #ffd1dc;
+      --bg-3: #fbc2eb;
+      --card: rgba(255, 255, 255, 0.82);
+      --ink: #4a1f33;
+      --ink-soft: #8a4a66;
+      --rose: #e64980;
+      --rose-dark: #c2255c;
+      --line: #f3b6c9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-x: hidden; background: #fbd3e4; }
+
+    body {
+      font-family: 'Quicksand', system-ui, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--bg-1), var(--bg-2) 50%, var(--bg-3));
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      padding: 24px 16px;
+      overflow-x: hidden;
+    }
+
+    /* Floating hearts background */
+    .hearts { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .heart {
+      position: absolute;
+      bottom: -40px;
+      font-size: 20px;
+      opacity: 0.55;
+      animation: float-up linear forwards;
+    }
+    @keyframes float-up {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.6; }
+      100% { transform: translateY(-115vh) rotate(25deg); opacity: 0; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 28px;
+      padding: 40px 28px;
+      box-shadow: 0 20px 60px rgba(194, 37, 92, 0.18), 0 2px 8px rgba(194, 37, 92, 0.08);
+      text-align: center;
+    }
+
+    .step { display: none; animation: fade-in 0.6s ease; }
+    .step.active { display: block; }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .big-emoji {
+      font-size: 64px;
+      line-height: 1;
+      margin-bottom: 12px;
+      display: inline-block;
+      animation: beat 1.4s ease-in-out infinite;
+    }
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.15); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.1); }
+    }
+
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.4rem, 9vw, 3.2rem);
+      color: var(--rose-dark);
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 7vw, 2.5rem);
+      color: var(--rose-dark);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    p { font-size: 1.05rem; line-height: 1.6; color: var(--ink-soft); }
+    p + p { margin-top: 10px; }
+
+    .btn-row {
+      position: relative;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 28px;
+      min-height: 56px;
+      flex-wrap: wrap;
+    }
+
+    button, .btn {
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 30px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--rose);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(230, 73, 128, 0.35);
+    }
+    .btn-primary:hover { background: var(--rose-dark); transform: translateY(-2px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink-soft);
+      border: 2px solid var(--line);
+    }
+    .btn-ghost:hover { border-color: var(--rose); color: var(--rose-dark); }
+
+    #noBtn { transition: left 0.25s ease, top 0.25s ease, transform 0.15s ease; }
+    #noBtn.runaway { position: fixed; z-index: 5; }
+
+    .no-hint {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      min-height: 1.4em;
+      color: var(--rose);
+      font-weight: 600;
+    }
+
+    form { text-align: left; margin-top: 24px; }
+
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--ink);
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 4px rgba(230, 73, 128, 0.15);
+    }
+    textarea { resize: vertical; min-height: 84px; }
+
+    .row { display: flex; gap: 12px; }
+    .row .field { flex: 1; min-width: 0; }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .choice span {
+      display: block;
+      text-align: center;
+      padding: 12px 8px;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+    }
+    .choice span:hover { border-color: var(--rose); }
+    .choice input:checked + span {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: #fff;
+    }
+    .choice input:focus-visible + span { box-shadow: 0 0 0 4px rgba(230, 73, 128, 0.25); }
+
+    .form-error {
+      color: var(--rose-dark);
+      font-weight: 600;
+      font-size: 0.9rem;
+      min-height: 1.3em;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    form .btn-primary { width: 100%; }
+
+    .summary {
+      margin: 22px 0 6px;
+      padding: 20px;
+      border-radius: 18px;
+      background: #fff;
+      border: 2px dashed var(--line);
+      text-align: left;
+    }
+    .summary div { display: flex; gap: 10px; padding: 6px 0; align-items: baseline; }
+    .summary .k { font-weight: 700; min-width: 64px; color: var(--ink); }
+    .summary .v { color: var(--ink-soft); word-break: break-word; }
+
+    .share { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .share .btn { width: 100%; }
+
+    .tiny { font-size: 0.85rem; margin-top: 16px; }
+
+    .signoff {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.6rem;
+      color: var(--rose-dark);
+      margin-top: 22px;
+    }
+
+    @media (max-width: 420px) {
+      .card { padding: 32px 20px; border-radius: 24px; }
+      .row { flex-direction: column; gap: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .big-emoji, .heart, .step { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
+
+  <main class="card">
+
+    <!-- Step 1: The question -->
+    <section class="step active" id="step-ask">
+      <div class="big-emoji">💌</div>
+      <h1>Hey Teeya,</h1>
+      <p>I made this little corner of the internet just for you.</p>
+      <p>I've been wanting to ask you something…</p>
+      <p><strong style="color: var(--ink); font-size: 1.2rem;">Will you go on a date with me?</strong></p>
+
+      <div class="btn-row">
+        <button class="btn-primary" id="yesBtn" type="button">Yes! 💕</button>
+        <button class="btn-ghost" id="noBtn" type="button">No</button>
+      </div>
+      <div class="no-hint" id="noHint"></div>
+    </section>
+
+    <!-- Step 2: Pick the date & time -->
+    <section class="step" id="step-plan">
+      <div class="big-emoji">🥰</div>
+      <h2>You just made my day!</h2>
+      <p>Now you get to choose — when works for you?</p>
+
+      <form id="dateForm" novalidate>
+        <div class="row">
+          <div class="field">
+            <label for="date">📅 Date</label>
+            <input type="date" id="date" name="date" required>
+          </div>
+          <div class="field">
+            <label for="time">⏰ Time</label>
+            <input type="time" id="time" name="time" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>✨ What sounds fun?</label>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="activity" value="Dinner" checked><span>🍝 Dinner</span></label>
+            <label class="choice"><input type="radio" name="activity" value="Coffee &amp; dessert"><span>☕ Coffee &amp; dessert</span></label>
+            <label class="choice"><input type="radio" name="activity" value="A movie"><span>🎬 A movie</span></label>
+            <label class="choice"><input type="radio" name="activity" value="A walk in the park"><span>🌸 A walk</span></label>
+            <label class="choice"><input type="radio" name="activity" value="Surprise me"><span>🎁 Surprise me</span></label>
+            <label class="choice"><input type="radio" name="activity" value="Something else"><span>💭 Something else</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="note">💬 Anything you'd like me to know? <span style="font-weight:500;color:var(--ink-soft)">(optional)</span></label>
+          <textarea id="note" name="note" placeholder="Ideas, wishes, a place you've been wanting to try…"></textarea>
+        </div>
+
+        <div class="form-error" id="formError" role="alert"></div>
+        <button class="btn-primary" type="submit">It's a date! 💖</button>
+      </form>
+    </section>
+
+    <!-- Step 3: Confirmation -->
+    <section class="step" id="step-done">
+      <div class="big-emoji">💖</div>
+      <h2>It's official!</h2>
+      <p>I can't wait. Here's what we've got:</p>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="share">
+        <a class="btn btn-primary" id="smsBtn" href="#">📱 Text me your answer</a>
+        <button class="btn-ghost" id="copyBtn" type="button">📋 Copy it</button>
+        <button class="btn-ghost" id="editBtn" type="button">✏️ Change something</button>
+      </div>
+      <p class="tiny">Tap “Text me your answer” so I get it — then it’s locked in 😊</p>
+
+      <div class="signoff">See you soon, Teeya ❤️</div>
+    </section>
+
+  </main>
+
+  <script>
+    // ---- Floating hearts ----
+    const heartsEl = document.getElementById('hearts');
+    const heartChars = ['💗', '💕', '💖', '❤️', '🌸', '💞'];
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function spawnHeart(burst) {
+      const h = document.createElement('span');
+      h.className = 'heart';
+      h.textContent = heartChars[Math.floor(Math.random() * heartChars.length)];
+      h.style.left = Math.random() * 90 + 'vw';
+      h.style.fontSize = (14 + Math.random() * (burst ? 28 : 18)) + 'px';
+      const dur = (burst ? 3 : 7) + Math.random() * 5;
+      h.style.animationDuration = dur + 's';
+      heartsEl.appendChild(h);
+      setTimeout(() => h.remove(), dur * 1000);
+    }
+    if (!reduceMotion) {
+      setInterval(() => spawnHeart(false), 700);
+    }
+    function heartBurst() {
+      if (reduceMotion) return;
+      for (let i = 0; i < 40; i++) setTimeout(() => spawnHeart(true), i * 40);
+    }
+
+    // ---- Step navigation ----
+    function show(id) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ---- The "No" button that doesn't want to be clicked ----
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const noHint = document.getElementById('noHint');
+    const noLines = [
+      'Hmm, are you sure? 🥺',
+      'That button seems shy…',
+      'Nice try 😏',
+      'The “Yes” button is right there 👀',
+      'I think you meant Yes 💕',
+      'Okay, the No button gave up.'
+    ];
+    let noCount = 0;
+    let yesScale = 1;
+
+    function dodge(e) {
+      if (e) e.preventDefault();
+      noCount++;
+      noHint.textContent = noLines[Math.min(noCount - 1, noLines.length - 1)];
+
+      // Make "Yes" grow a little each time
+      yesScale = Math.min(yesScale + 0.12, 1.7);
+      yesBtn.style.transform = `scale(${yesScale})`;
+
+      if (noCount >= noLines.length) {
+        noBtn.style.display = 'none';
+        return;
+      }
+
+      // Jump to a random spot on screen
+      const rect = noBtn.getBoundingClientRect();
+      const pad = 16;
+      const maxX = window.innerWidth - rect.width - pad;
+      const maxY = window.innerHeight - rect.height - pad;
+      noBtn.classList.add('runaway');
+      noBtn.style.left = Math.max(pad, Math.random() * maxX) + 'px';
+      noBtn.style.top = Math.max(pad, Math.random() * maxY) + 'px';
+    }
+    noBtn.addEventListener('mouseenter', dodge);
+    noBtn.addEventListener('touchstart', dodge, { passive: false });
+    noBtn.addEventListener('click', dodge);
+
+    yesBtn.addEventListener('click', () => {
+      noBtn.style.display = 'none';
+      heartBurst();
+      show('step-plan');
+    });
+
+    // ---- Form ----
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    const formError = document.getElementById('formError');
+
+    // Don't allow dates in the past
+    const today = new Date();
+    const pad2 = n => String(n).padStart(2, '0');
+    dateInput.min = `${today.getFullYear()}-${pad2(today.getMonth() + 1)}-${pad2(today.getDate())}`;
+
+    let answer = null;
+
+    function prettyDate(value) {
+      const [y, m, d] = value.split('-').map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+      });
+    }
+    function prettyTime(value) {
+      const [h, min] = value.split(':').map(Number);
+      const d = new Date();
+      d.setHours(h, min, 0, 0);
+      return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    }
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    document.getElementById('dateForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      formError.textContent = '';
+
+      if (!dateInput.value) { formError.textContent = 'Pick a date for us 📅'; dateInput.focus(); return; }
+      if (dateInput.value < dateInput.min) { formError.textContent = 'That day already passed — pick a future one 🙂'; dateInput.focus(); return; }
+      if (!timeInput.value) { formError.textContent = 'And a time, please ⏰'; timeInput.focus(); return; }
+
+      answer = {
+        date: prettyDate(dateInput.value),
+        time: prettyTime(timeInput.value),
+        activity: document.querySelector('input[name="activity"]:checked').value,
+        note: document.getElementById('note').value.trim()
+      };
+
+      const rows = [
+        ['📅 Date', answer.date],
+        ['⏰ Time', answer.time],
+        ['✨ Plan', answer.activity]
+      ];
+      if (answer.note) rows.push(['💬 Note', answer.note]);
+      document.getElementById('summary').innerHTML = rows
+        .map(([k, v]) => `<div><span class="k">${k}</span><span class="v">${escapeHtml(v)}</span></div>`)
+        .join('');
+
+      const message =
+        `Yes! 💕 Let's go on a date!\n` +
+        `📅 ${answer.date}\n` +
+        `⏰ ${answer.time}\n` +
+        `✨ ${answer.activity}` +
+        (answer.note ? `\n💬 ${answer.note}` : '') +
+        `\n— Teeya`;
+      answer.message = message;
+
+      // To have the text go straight to you, put your phone number here, e.g. 'sms:+15551234567'
+      const PHONE = '';
+      const sep = /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent) ? '&' : '?';
+      document.getElementById('smsBtn').href = `sms:${PHONE}${sep}body=${encodeURIComponent(message)}`;
+
+      heartBurst();
+      show('step-done');
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      try {
+        await navigator.clipboard.writeText(answer.message);
+        btn.textContent = '✅ Copied!';
+      } catch {
+        btn.textContent = '😅 Couldn’t copy — screenshot it instead';
+      }
+      setTimeout(() => { btn.textContent = '📋 Copy it'; }, 2200);
+    });
+
+    document.getElementById('editBtn').addEventListener('click', () => show('step-plan'));
+  </script>
+</body>
+</html>
